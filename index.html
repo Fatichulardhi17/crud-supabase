@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase User Management Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-glow glow-1"></div>
+    <div class="background-glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                    <h1>Supabase User Manager</h1>
+                    <p class="subtitle">Aplikasi CRUD Modular Express & Supabase</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="status-badge" id="dbStatus">
+                    <span class="status-dot"></span> <span id="statusText">Checking...</span>
+                </span>
+                <button class="btn btn-primary" id="btnOpenAddModal">
+                    <i class="fa-solid fa-plus"></i> Tambah User
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Total User</span>
+                    <h3 id="statTotalUsers">0</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">User Aktif</span>
+                    <h3 id="statActiveUsers">0</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Admin / Manager</span>
+                    <h3 id="statAdmins">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Card Section -->
+        <main class="content-card">
+            <!-- Controls Bar -->
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Cari nama atau email...">
+                </div>
+                <div class="filter-box">
+                    <button class="btn btn-secondary" id="btnRefresh">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Table -->
+            <div class="table-responsive">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Pengguna</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+                <div id="tableLoading" class="table-loading hidden">
+                    <div class="spinner"></div>
+                    <p>Memuat data dari Supabase...</p>
+                </div>
+                <div id="emptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-folder-open empty-icon"></i>
+                    <h3>Belum ada data user</h3>
+                    <p>Klik tombol "Tambah User" untuk membuat pengguna baru.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Form (Add / Edit) -->
+    <div class="modal-overlay hidden" id="userModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah User Baru</h3>
+                <button class="btn-close" id="btnCloseModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-group">
+                    <label for="userName"><i class="fa-regular fa-user"></i> Nama Lengkap</label>
+                    <input type="text" id="userName" placeholder="Contoh: Budi Santoso" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail"><i class="fa-regular fa-envelope"></i> Alamat Email</label>
+                    <input type="email" id="userEmail" placeholder="Contoh: budi@example.com" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="userRole"><i class="fa-solid fa-user-gear"></i> Role</label>
+                        <select id="userRole">
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="userStatus"><i class="fa-solid fa-toggle-on"></i> Status</label>
+                        <select id="userStatus">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelModal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveUser">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
