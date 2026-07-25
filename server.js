@@ -35,9 +35,13 @@ app.get('/api/health', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Jalankan Server & Test DB Connection
-app.listen(PORT, async () => {
-    console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
-    console.log(`📋 Menguji koneksi ke Supabase...`);
-    await testConnection();
-});
+// Jalankan Server secara lokal (jika tidak berjalan sebagai Netlify Function)
+if (process.env.NETLIFY !== 'true' && require.main === module) {
+    app.listen(PORT, async () => {
+        console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+        console.log(`📋 Menguji koneksi ke Supabase...`);
+        await testConnection();
+    });
+}
+
+module.exports = app;
