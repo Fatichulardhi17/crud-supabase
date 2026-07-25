@@ -9,10 +9,13 @@ const successResponse = (res, statusCode = 200, message = "Berhasil", data = nul
 };
 
 const errorResponse = (res, statusCode = 500, message = "Terjadi kesalahan", error = null) => {
+    const errorDetails = error ? (error.message || JSON.stringify(error)) : null;
+    const fullMessage = errorDetails ? `${message} (${errorDetails})` : message;
+
     return res.status(statusCode).json({
         success: false,
-        message,
-        ...(error && { error: error.message || error })
+        message: fullMessage,
+        ...(errorDetails && { details: errorDetails })
     });
 };
 

@@ -20,11 +20,19 @@ app.use(rateLimiter);
 // File statis untuk UI (Frontend)
 app.use(express.static(path.join(__dirname)));
 
-// API Routes
+// API Routes (Dukungan rute lokal & serverless Netlify)
 app.use('/api/users', userRoutes);
+app.use('/users', userRoutes);
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'OK',
         timestamp: new Date().toISOString()
@@ -35,7 +43,7 @@ app.get('/api/health', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Jalankan Server secara lokal (jika tidak berjalan sebagai Netlify Function)
+// Jalankan Server secara lokal
 if (process.env.NETLIFY !== 'true' && require.main === module) {
     app.listen(PORT, async () => {
         console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
